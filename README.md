@@ -3,11 +3,11 @@ Just a small bash script to launch tmux with a defined layout
 
 Call it like
 
-    tmux-launcher path-to-layout-file
+    tmux-launch path-to-layout-file
     
 You first of course should do a 
 
-    chmod u+x tmux-launcher
+    chmod u+x tmux-launch
     
 ### Where to put
 I have a bin folder in my home dir. And that's the location, I put the tmux-launch file. The layout files are there too, but this should become a matter of change.
