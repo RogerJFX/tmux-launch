@@ -1,0 +1,59 @@
+#!/bin/bash
+
+scriptPath=`dirname "$0"`
+
+if [[ $# -eq 0 ]] ; then
+    echo $'\aPlease provide a layout file.' "Suggestions are (in $scriptPath):"$'\n'
+    ls -l $scriptPath | grep layout
+    echo $'\nExiting'
+    exit 1
+fi
+
+SN=$1
+
+layout="$(cat $SN | grep "^[^#]" 2>/dev/null)" 
+
+if [[ $layout = '' ]] ; then
+    echo $'\aCould not find file' $SN "in" $(pwd). "Suggestions are (in $scriptPath):"$'\n'
+    ls -l $scriptPath | grep layout
+    echo $'\nExiting'
+    exit 1
+fi
+
+tmux start-server
+
+tmux has-session -t $SN &>/dev/null
+
+findPane() {
+	local x=$(($1+1))
+	local t1=$(tmux list-panes | grep %$x)
+	local target=$(echo $t1 | cut -b 1)
+	echo "$target"
+}
+
+# id, parent id, percent, direction, directory, command
+createPane() {
+	local target=$(findPane $2)
+	tmux split-window -t $target -$4 -p $3
+	tmux send-keys "cd $5 && $6" C-m
+}
+
+if [ $? = 0 ] 
+then
+	echo "new session"
+    tmux new -s $SN -n conf -d
+    tmux new-window -t $SN:1 -n misc
+
+	while IFS=$'\t' read name id pid percent direction directory command; do
+		if [ $id = 0 ]; then
+			tmux send-keys "cd $directory && $command" C-m
+		else
+			createPane $id $pid $percent $direction "$directory" "$command"
+		fi
+	done <<< "$layout"
+
+else 
+	echo "session exists"
+fi
+
+tmux -2 attach -t $SN 
