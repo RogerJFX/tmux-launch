@@ -1,6 +1,6 @@
 #Values must be seperated by one or more \t
 #name, id, parent id, percent, direction, directory, command
-topLeft		0	-1	-1	-	~	htop
+topLeft	0	-1	-1	-	~	htop
 topRight	1	0	50	h	~	pwd
 bottomRight	3	1	50	v	~	ssh -t roger@crazything.eu 'htop; bash'
 bottomLeft	2	0	50	v	~	whoami
